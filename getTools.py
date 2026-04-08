@@ -10,9 +10,9 @@ if __name__ == "__main__":
     os.makedirs(lib_dir, exist_ok=True)
     
     # Il2CppInspectorRedux
-    il2cppInspectorReduxUrl = "https://nightly.link/ArkanDash/Il2CppInspectorRedux/workflows/build/master/Il2CppInspectorRedux.CLI-linux-x64.zip"
+    il2cppInspectorReduxUrl = "https://nightly.link/CodenameAim/Il2CppInspectorRedux/workflows/build/master/Il2CppInspectorRedux.CLI-linux-x64.zip"
     if os_system == "Windows":
-        il2cppInspectorReduxUrl = "https://github.com/ArkanDash/Il2CppInspectorRedux/suites/53860824658/artifacts/5064228717"
+        il2cppInspectorReduxUrl = "https://nightly.link/CodenameAim/Il2CppInspectorRedux/workflows/build/master/Il2CppInspectorRedux.CLI-win-x64.zip"
     il2cppDownloader = FileDownloader(il2cppInspectorReduxUrl, lib_dir, "il2cppinspector.zip")
     il2cppDownloader.download()
     FileExtractor(il2cppDownloader.local_filepath, lib_dir).extract_il2cppData()
