@@ -9,7 +9,7 @@ APKPURE_PKG_PATTERN = r'<link rel="canonical" href="https://apkpure\.com/[^/]+/(
 APKCOMBO_URL = "https://apkcombo.com/{app_name}/{pkg}/download/apk"
 APKCOMBO_VER_PATTERN = r'Version:\s*([\d\.]+)'
 APKCOMBO_CDN_PATTERN = r'https%3A%2F%2Fapks\.[^.]+\.r2\.cloudflarestorage\.com%2F[^&"]+'
-
+    
 def get_apk_url(pkg: str):
     (apk_pure_version, apk_pure_cdn_url) = get_apkpure_url(pkg)
     (apk_combo_version, apk_combo_cdn_url) = get_apkcombo_url(pkg)
@@ -20,7 +20,7 @@ def get_apk_url(pkg: str):
     if pure_build == 0 and combo_build == 0:
         raise ValueError("Critical Error: Could not detect version builds from either source.")
 
-    if pure_build > combo_build and apk_pure_cdn_url:
+    if pure_build == combo_build and apk_pure_cdn_url:
         return apk_pure_cdn_url
     
     if apk_combo_cdn_url:
@@ -33,19 +33,9 @@ def get_apk_url(pkg: str):
 
 def get_apkpure_url(pkg: str) -> (str, str):
     url = APKPURE_URL.format(pkg=pkg)
-    scraper = cloudscraper.create_scraper(
-        browser={
-            'browser': 'chrome',
-            'platform': 'windows',
-            'desktop': True
-        }
-    )
-    headers = {
-        'Referer': f'https://apkpure.com/blue-archive/com.YostarJP.BlueArchive/download',
-        'Accept-Language': 'en-US,en;q=0.9'
-    }
+    scraper = cloudscraper.create_scraper()
     try:
-        response = scraper.get(url, headers=headers, stream=True, timeout=10)
+        response = scraper.get(url, timeout=10)
         response.raise_for_status()
         file_content = response.text
         
@@ -57,8 +47,8 @@ def get_apkpure_url(pkg: str) -> (str, str):
         
         cdn_url = f"https://d.apkpure.com/b/XAPK/{package}?version=latest" if package else None
         
-        # print(f"APKPure Version: {version}")
-        # print(f"APKPure CDN URL: {cdn_url}")
+        print(f"APKPure Version: {version}")
+        print(f"APKPure CDN URL: {cdn_url}")
         
         return version, cdn_url
     except Exception as e:
@@ -80,7 +70,7 @@ def get_apkcombo_url(pkg: str) -> (str, str):
         'Accept-Language': 'en-US,en;q=0.9'
     }
     try:
-        response = scraper.get(url, headers=headers, stream=True, timeout=10)
+        response = scraper.get(url, headers=headers, timeout=10)
         response.raise_for_status()
         file_content = response.text
         
@@ -91,8 +81,8 @@ def get_apkcombo_url(pkg: str) -> (str, str):
         raw_cdn = cdn_match.group(0) if cdn_match else None
         cdn_url = urllib.parse.unquote(raw_cdn) if raw_cdn else None
         
-        # print(f"APKCombo Version: {version}")
-        # print(f"APKCombo CDN URL: {cdn_url}")
+        print(f"APKCombo Version: {version}")
+        print(f"APKCombo CDN URL: {cdn_url}")
         
         return version, cdn_url
     except Exception as e:
