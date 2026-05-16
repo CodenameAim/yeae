@@ -69,7 +69,7 @@ jobs:
           fi
         
       - name: Run Dumper
-        run: python getJPVersion.py --sql-cipher-url ${{ secrets.SQL_FETCH_URL }}
+        run: python getJPVersion.py --sql-cipher-url "${{ secrets.SQL_FETCH_URL }}"
 
       - name: Save content temporary
         id: save_data
