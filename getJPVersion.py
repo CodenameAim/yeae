@@ -16,10 +16,13 @@ if __name__ == "__main__":
         "--sql-cipher-url",
         required=False,
         default=None,
+        nargs='?',
         help="SQL Cipher Key URL (default: None)",
     )
     args = parser.parse_args()
     sql_cipher_url = args.sql_cipher_url
+    if sql_cipher_url == "":
+        sql_cipher_url = None
     
     os_system = platform.system()
     tools_dir = os.path.join(os.getcwd(), f'tools')
