@@ -18,6 +18,12 @@ def get_apk_url(pkg: str):
     combo_build = parse_ver(apk_combo_version)
 
     if pure_build == 0 and combo_build == 0:
+        if apk_pure_cdn_url:
+            print("Warning: Could not detect version builds, but falling back to APKPure CDN URL.")
+            return apk_pure_cdn_url
+        if apk_combo_cdn_url:
+            print("Warning: Could not detect version builds, but falling back to APKCombo CDN URL.")
+            return apk_combo_cdn_url
         raise ValueError("Critical Error: Could not detect version builds from either source.")
 
     if pure_build == combo_build and apk_pure_cdn_url:
@@ -34,6 +40,9 @@ def get_apk_url(pkg: str):
 def get_apkpure_url(pkg: str) -> (str, str):
     url = APKPURE_URL.format(pkg=pkg)
     scraper = cloudscraper.create_scraper()
+    # Default fallback CDN URL using the provided package name
+    default_cdn_url = f"https://d.apkpure.com/b/XAPK/{pkg}?version=latest"
+    
     try:
         response = scraper.get(url, timeout=10)
         response.raise_for_status()
@@ -43,16 +52,17 @@ def get_apkpure_url(pkg: str) -> (str, str):
         package_match = re.search(APKPURE_PKG_PATTERN, file_content)
         
         version: str | None = version_match.group(1) if version_match else None
-        package = package_match.group(1) if package_match else None
+        package = package_match.group(1) if package_match else pkg
         
-        cdn_url = f"https://d.apkpure.com/b/XAPK/{package}?version=latest" if package else None
+        cdn_url = f"https://d.apkpure.com/b/XAPK/{package}?version=latest"
         
         print(f"APKPure Version: {version}")
         print(f"APKPure CDN URL: {cdn_url}")
         
         return version, cdn_url
     except Exception as e:
-        return None, None
+        print(f"APKPure Scraping failed: {e}")
+        return None, default_cdn_url
 
 def get_apkcombo_url(pkg: str) -> (str, str):
     app_name = "blue-archive-jp" if pkg == "com.YostarJP.BlueArchive" else "blue-archive"
